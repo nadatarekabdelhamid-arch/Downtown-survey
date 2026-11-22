@@ -108,9 +108,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,.check:focus-wit
 details summary{cursor:pointer}
 /* walk stage */
 #stage{position:fixed;inset:0;background:var(--stage);z-index:20;overflow:hidden}
-.strip{position:absolute;left:0;top:0;height:100%;display:flex;will-change:transform}
-.strip img{height:100%;width:auto;max-width:none;display:block;margin-right:-40px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 40px);mask-image:linear-gradient(90deg,transparent 0,#000 40px)}
-.strip img:first-child{-webkit-mask-image:none;mask-image:none}
+.strip{position:absolute;left:0;top:0;height:100%;will-change:transform}
+.strip img{position:absolute;top:50%;transform:translateY(-50%);display:block;max-width:none;border-radius:4px;box-shadow:0 10px 40px rgba(0,0,0,.55)}
 #turnwrap{position:absolute;inset:0;perspective:900px}
 .view{position:absolute;inset:0;overflow:hidden;backface-visibility:hidden;will-change:transform,opacity}
 #sidelab{position:fixed;left:calc(16px + env(safe-area-inset-left,0px));top:18px;z-index:21;color:var(--stage-ink);background:rgba(0,0,0,.45);padding:5px 11px;border-radius:6px;font-size:13px;transition:opacity .5s}
@@ -138,10 +137,9 @@ ul.clean li::before{left:auto;inset-inline-start:0}
 [dir=rtl] .lead{line-height:1.75}
 @media (max-width:560px){.brand span{display:none}.langbtn{margin-inline-start:auto}}
 </style>
+
 </head>
 <body>
-
-
 
 <header class="bar"><div class="bar-in">
   <div class="brand"><b id="brandName"></b><span id="brandDept"></span><button type="button" class="langbtn" id="langBtn"></button></div>
@@ -257,7 +255,7 @@ ar:{
 /* answer options: saved value (English) → Arabic label */
 const OPT_AR = {
   "Yes":"نعم","No":"لا","Not sure":"لست متأكدًا",
-  "4 or more days a week":"٤ أيام أو أكثر في الأسبوع","1–3 days a week":"١–٣ أيام في الأسبوع","1–3 times a month":"١–٣ مرات في الشهر","Less than once a month":"أقل من مرة في الشهر",
+  "4 or more days a week":"٤ أيام أو أكثر في الأسبوع","1–3 days a week":"١–٣ أيام في الأسبوع","1–3 times a month":"١–٣ مرات في الشهر","Less than once a month":"أقل من مرة في الشهر","I don’t go to Downtown":"لا أذهب إلى وسط البلد",
   "Less than 6 months":"أقل من ٦ أشهر","6 months to 2 years":"من ٦ أشهر إلى سنتين","More than 2 years":"أكثر من سنتين",
   "Female":"أنثى","Male":"ذكر","Prefer not to say":"أفضّل عدم الإجابة",
   "Student":"طالب/ة","Employed":"موظف/ة","Self-employed":"أعمل لحسابي","Not working":"لا أعمل","Other":"أخرى",
@@ -360,17 +358,19 @@ function screening(){
   <div class="panel">
   <div class="q"><label class="t" for="age">${t.age}</label><input type="number" id="age" inputmode="numeric" min="10" max="99" value="${ageVal}"></div>
   <div class="q"><span class="t">${t.lives}</span><span class="muted">${t.livesDef}</span>${choice("lives_cairo",["Yes","No"],true,A.lives_cairo)}</div>
-  <div class="q"><span class="t">${t.freq}</span>${choice("dt_frequency",["4 or more days a week","1–3 days a week","1–3 times a month","Less than once a month"],false,A.dt_frequency)}</div>
-  <div class="q"><span class="t">${t.dur}</span><span class="muted">${t.durHint}</span>${choice("dt_duration",["Less than 6 months","6 months to 2 years","More than 2 years"],false,A.dt_duration)}</div>
+  <div class="q"><span class="t">${t.freq}</span>${choice("dt_frequency",["4 or more days a week","1–3 days a week","1–3 times a month","Less than once a month","I don’t go to Downtown"],false,A.dt_frequency)}</div>
+  <div class="q" id="durq"${A.dt_frequency==="I don’t go to Downtown"?" hidden":""}><span class="t">${t.dur}</span><span class="muted">${t.durHint}</span>${choice("dt_duration",["Less than 6 months","6 months to 2 years","More than 2 years"],false,A.dt_duration)}</div>
   </div>`,{next:()=>{
     const age=+$("age").value; Object.assign(R,A,{age}); delete R._age_draft;
     let group="occasional_visitor";
     if(A.dt_frequency==="4 or more days a week" && A.dt_duration!=="Less than 6 months") group="daily_user";
-    else if(A.dt_frequency==="Less than once a month") group="infrequent_visitor";
+    else if(A.dt_frequency==="Less than once a month"||A.dt_frequency==="I don’t go to Downtown") group="infrequent_visitor";
     R.group=group; R.in_age_range=(age>=18&&age<=35)?"yes":"no";
     if(age<18){ submit(true); current=()=>screen(`<h2>${T().under18H}</h2><p class="lead">${T().under18P}</p>`); current(); return; }
     next(); }});
-  const check=()=>{ const age=+$("age").value; R._age_draft=$("age").value; Object.assign(R,{lives_cairo:A.lives_cairo,dt_frequency:A.dt_frequency,dt_duration:A.dt_duration}); setReady(age>0 && A.lives_cairo && A.dt_frequency && A.dt_duration); };
+  const check=()=>{ const never=A.dt_frequency==="I don’t go to Downtown"; $("durq").hidden=never;
+    if(never) A.dt_duration="Not applicable"; else if(A.dt_duration==="Not applicable"){ A.dt_duration=undefined; document.querySelectorAll('[data-q="dt_duration"] button').forEach(b=>{b.classList.remove("on");b.setAttribute("aria-checked","false");}); }
+    const age=+$("age").value; R._age_draft=$("age").value; Object.assign(R,{lives_cairo:A.lives_cairo,dt_frequency:A.dt_frequency,dt_duration:A.dt_duration}); setReady(age>0 && A.lives_cairo && A.dt_frequency && A.dt_duration); };
   wireChoices(A,check); $("age").oninput=check; check();
 }
 
@@ -438,7 +438,8 @@ function background(){
   wireChoices(A,check); $("area").oninput=check; $("comment").oninput=check; check();
 }
 
-/* ---------- walk player: left side passes, the view turns, right side passes ---------- */
+/* ---------- walk player: each photo is shown on its own; the camera pans from one photo to the next.
+   Left side first, the view turns, then the right side. ---------- */
 function playWalk(code,done){
   const {seq:all}=seq(code);
   const L=all.filter(x=>x.side==="Left"), Rt=all.filter(x=>x.side==="Right");
@@ -446,19 +447,28 @@ function playWalk(code,done){
   const imgs=list=>list.map(x=>`<img alt="" src="${x.src}" decoding="async">`).join("");
   st.innerHTML=`<div id="turnwrap" dir="ltr"><div class="view" id="vL"><div class="strip" id="sL">${imgs(L)}</div></div><div class="view" id="vR" style="opacity:0"><div class="strip" id="sR">${imgs(Rt)}</div></div></div>`;
   st.hidden=false; ["wbar","wlabel","skip","sidelab"].forEach(id=>$(id).hidden=false);
-  const stripW=list=>{ const H=st.clientHeight; return list.reduce((a,x)=>a+H*x.w/x.h-40,40); };
   const T_=CONFIG.WALK_SECONDS, TURN=1.6, SIDE=(T_-TURN)/2;
+  /* lay each photo out whole (fitted to the screen), with a dark gap between photos; returns the centre of each photo */
+  let lastSize="";
+  const layout=()=>{ const W=st.clientWidth, H=st.clientHeight, key=W+"x"+H; if(key===lastSize) return; lastSize=key;
+    [["sL",L],["sR",Rt]].forEach(([id,list])=>{ const strip=$(id); let x=0; const gap=Math.max(28,W*0.06); strip._c=[];
+      [...strip.children].forEach((im,i)=>{ const it=list[i], sc=Math.min((H*0.92)/it.h,(W*0.9)/it.w), w=it.w*sc, h=it.h*sc;
+        im.style.width=w+"px"; im.style.height=h+"px"; im.style.left=x+"px"; strip._c.push(x+w/2); x+=w+gap; }); }); };
+  /* camera: hold on a photo, then glide to the next one */
+  const ease=x=>x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2;
+  const camera=(c,p)=>{ const n=c.length; if(n<2) return c[0]||0; const HOLD=1.3, MOVE=1, total=n*HOLD+(n-1)*MOVE;
+    let u=Math.max(0,Math.min(1,p))*total; for(let i=0;i<n;i++){ if(u<=HOLD) return c[i]; u-=HOLD; if(i<n-1){ if(u<=MOVE) return c[i]+(c[i+1]-c[i])*ease(u/MOVE); u-=MOVE; } } return c[n-1]; };
   const lab=$("sidelab"); lab.textContent=T().left; lab.style.opacity=1;
   const t0=performance.now(); let ended=false, phase=0;
   const end=(skipped)=>{ if(ended) return; ended=true; const watched=Math.min(T_,(performance.now()-t0)/1000);
     st.hidden=true; ["wbar","wlabel","skip","sidelab"].forEach(id=>$(id).hidden=true); st.innerHTML=""; done(+watched.toFixed(1),skipped); };
   $("skip").onclick=()=>end(true);
-  const ease=x=>x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2;
   const tick=()=>{ if(ended) return;
     const t=(performance.now()-t0)/1000, vw=st.clientWidth; if(t>=T_){ end(false); return; }
+    layout();
     const sL=$("sL"), sR=$("sR"), vL=$("vL"), vR=$("vR");
-    const pL=Math.min(1,t/SIDE); sL.style.transform=`translateX(${-Math.max(0,stripW(L)-vw)*pL}px)`;
-    const pR=Math.max(0,Math.min(1,(t-SIDE-TURN)/SIDE)); sR.style.transform=`translateX(${-Math.max(0,stripW(Rt)-vw)*(1-pR)}px)`;
+    sL.style.transform=`translateX(${vw/2-camera(sL._c,t/SIDE)}px)`;
+    sR.style.transform=`translateX(${vw/2-camera(sR._c,1-Math.max(0,(t-SIDE-TURN)/SIDE))}px)`;
     if(t>SIDE && t<SIDE+TURN){ const q=ease((t-SIDE)/TURN);
       vL.style.transform=`translateX(${-q*40}%) rotateY(${q*75}deg)`; vL.style.opacity=1-q;
       vR.style.transform=`translateX(${(1-q)*40}%) rotateY(${-(1-q)*75}deg)`; vR.style.opacity=q;
