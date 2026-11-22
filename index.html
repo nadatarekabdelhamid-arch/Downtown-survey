@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Downtown Streets Study</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: a study instrument. Slim header with study name and section stepper; one centred column per screen; sticky action bar at the bottom; walks fill the screen on a dark stage. */
+:root{
+  --paper:#F4F4F0; --card:#FFFFFF; --ink:#1B201D; --muted:#5D655F; --line:#DADDD6; --soft:#EEF0EB;
+  --accent:#2E5A52; --accent-ink:#F4F7F5; --ochre:#B98A35; --warn:#9B3B26;
+  --stage:#0F110F; --stage-ink:#F3F5F1;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#131614; --card:#1B1F1C; --ink:#E7EAE5; --muted:#A2AAA4; --line:#2F3631; --soft:#232925;
+  --accent:#8CC0B4; --accent-ink:#0F1F1B; --ochre:#D7AE60; --warn:#E89A86; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#131614; --card:#1B1F1C; --ink:#E7EAE5; --muted:#A2AAA4; --line:#2F3631; --soft:#232925;
+  --accent:#8CC0B4; --accent-ink:#0F1F1B; --ochre:#D7AE60; --warn:#E89A86; color-scheme:dark}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+header.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.bar-in{max-width:720px;margin:0 auto;padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:10px}
+.brand{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.brand b{font-family:var(--serif);font-size:18px;font-weight:600;letter-spacing:-.005em}
+.brand span{font-size:12px;color:var(--muted);text-align:right}
+.stepper{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.stepper div{display:flex;flex-direction:column;gap:5px;font-size:11.5px;color:var(--muted);letter-spacing:.02em}
+.stepper i{display:block;height:3px;border-radius:2px;background:var(--line);overflow:hidden}
+.stepper i b{display:block;height:100%;background:var(--accent);width:0;transition:width .4s ease}
+.stepper div.now{color:var(--ink);font-weight:600}
+main{max-width:720px;margin:0 auto;padding-block:28px 120px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.screen{display:flex;flex-direction:column;gap:22px;animation:rise .35s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ochre);font-weight:600}
+h1{font-family:var(--serif);font-size:clamp(30px,6vw,42px);line-height:1.08;margin:0;font-weight:500;letter-spacing:-.01em;text-wrap:balance}
+h2{font-family:var(--serif);font-size:clamp(24px,4.6vw,30px);line-height:1.15;margin:0;font-weight:500;text-wrap:balance}
+h3{font-size:13px;letter-spacing:.1em;text-transform:uppercase;margin:0;color:var(--muted);font-weight:600}
+p{margin:0}
+.lead{font-size:18px;line-height:1.55}
+.muted{color:var(--muted);font-size:14px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 20px 22px;display:flex;flex-direction:column;gap:14px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.facts div{background:var(--card);padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.facts b{font-family:var(--serif);font-size:24px;font-weight:500;line-height:1.1}
+.facts span{font-size:12.5px;color:var(--muted)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cols>div{min-width:0}
+ul.clean{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+ul.clean li{padding-left:18px;position:relative}
+ul.clean li::before{content:"";position:absolute;left:0;top:.7em;width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.hero{position:relative;height:190px;border-radius:14px;overflow:hidden;background:var(--stage)}
+.hero .track{position:absolute;inset:0 auto 0 0;display:flex;gap:4px;animation:pan 60s linear infinite}
+.hero img{height:100%;width:auto;display:block;max-width:none}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.35),transparent 55%)}
+.hero span{position:absolute;left:14px;bottom:10px;color:#fff;font-size:12.5px;z-index:1}
+@keyframes pan{to{transform:translateX(-50%)}}
+.scenario{font-family:var(--serif);font-size:21px;line-height:1.45;padding:18px 20px;border-left:3px solid var(--ochre);background:var(--card);border-radius:0 12px 12px 0}
+.q{display:flex;flex-direction:column;gap:10px;padding-block:16px;border-top:1px solid var(--line)}
+.q:first-child{border-top:0;padding-top:0}
+.q .t{font-weight:500;font-size:16.5px}
+.likert{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.likert button{height:46px;border-radius:10px;border:1px solid var(--line);background:var(--soft);color:var(--ink);font:inherit;font-weight:500;cursor:pointer;padding:0;transition:background .15s,border-color .15s}
+.likert button:hover{border-color:var(--accent)}
+.likert button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.anchors{display:grid;grid-template-columns:1fr 1fr 1fr;font-size:12px;color:var(--muted)}
+.anchors span:nth-child(2){text-align:center}.anchors span:nth-child(3){text-align:right}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opts button{text-align:left;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;padding:12px 14px;cursor:pointer;display:flex;gap:12px;align-items:center}
+.opts button::before{content:"";width:16px;height:16px;border-radius:50%;border:1.5px solid var(--muted);flex:none}
+.opts button.on{border-color:var(--accent);background:var(--soft)}
+.opts button.on::before{border:5px solid var(--accent)}
+.opts.row{flex-direction:row;flex-wrap:wrap}.opts.row button{flex:1;min-width:110px}
+input[type=number],input[type=text],textarea{font:inherit;padding:11px 13px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);width:100%}
+input[type=number]{max-width:140px}
+textarea{min-height:96px;resize:vertical}
+.check{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;background:var(--card);border:1px solid var(--line);border-radius:12px;cursor:pointer}
+.check input{margin-top:4px;width:18px;height:18px;accent-color:var(--accent);flex:none}
+.thumbs{display:flex;gap:4px;height:92px;border-radius:10px;overflow:hidden;background:var(--stage)}
+.thumbs img{height:100%;width:auto;flex:1 1 0;min-width:0;object-fit:cover}
+.prefs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.pref{min-width:0;display:flex;flex-direction:column;gap:8px;padding:8px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;font:inherit;color:var(--ink);text-align:left}
+.pref.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.pthumbs{display:flex;gap:3px;height:120px;border-radius:8px;overflow:hidden;background:var(--stage)}
+.pthumbs img{height:100%;width:auto;flex:1 1 0;min-width:0;object-fit:cover}
+.plabel{font-weight:600;padding:0 4px 2px}
+@media (max-width:560px){.prefs{grid-template-columns:minmax(0,1fr)}.pthumbs{height:96px}}
+.walknum{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.bignum{font-family:var(--serif);font-size:64px;line-height:1;font-weight:500}
+.actions{position:fixed;left:0;right:0;bottom:0;z-index:6;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.actions-in{max-width:720px;margin:0 auto;padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;justify-content:space-between;align-items:center;gap:12px}
+.btn{border-radius:10px;padding:12px 22px;font:inherit;font-weight:600;cursor:pointer;border:1px solid transparent}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.primary:disabled{opacity:.35;cursor:not-allowed}
+.btn.ghost{background:transparent;border-color:var(--line);color:var(--ink);font-weight:500}
+.hint{font-size:13px;color:var(--muted)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,.check:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.testbar{position:relative;background:var(--warn);color:#fff;font-size:12px;text-align:center;padding:3px 16px;z-index:30}
+details summary{cursor:pointer}
+/* walk stage */
+#stage{position:fixed;inset:0;background:var(--stage);z-index:20;overflow:hidden}
+.strip{position:absolute;left:0;top:0;height:100%;display:flex;will-change:transform}
+.strip img{height:100%;width:auto;max-width:none;display:block;margin-right:-40px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 40px);mask-image:linear-gradient(90deg,transparent 0,#000 40px)}
+.strip img:first-child{-webkit-mask-image:none;mask-image:none}
+#turnwrap{position:absolute;inset:0;perspective:900px}
+.view{position:absolute;inset:0;overflow:hidden;backface-visibility:hidden;will-change:transform,opacity}
+#sidelab{position:fixed;left:calc(16px + env(safe-area-inset-left,0px));top:18px;z-index:21;color:var(--stage-ink);background:rgba(0,0,0,.45);padding:5px 11px;border-radius:6px;font-size:13px;transition:opacity .5s}
+#wbar{position:fixed;left:0;right:0;top:0;height:4px;background:rgba(255,255,255,.18);z-index:21}
+#wbar i{display:block;height:100%;width:0;background:var(--stage-ink)}
+#wlabel{position:fixed;left:calc(16px + env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));color:var(--stage-ink);background:rgba(0,0,0,.45);padding:6px 12px;border-radius:20px;font-family:var(--mono);font-size:13px;z-index:21}
+#skip{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:21;background:rgba(0,0,0,.45);color:var(--stage-ink);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+#ph{position:fixed;left:50%;top:14px;transform:translateX(-50%);background:var(--warn);color:#fff;padding:4px 10px;border-radius:6px;font-size:12.5px;z-index:21}
+@media (max-width:560px){.cols{grid-template-columns:1fr}.facts b{font-size:21px}.likert button{height:42px}.brand span{display:none}}
+@media (prefers-reduced-motion:reduce){.screen{animation:none}.hero .track{animation:none}.stepper i b{transition:none}}
+
+.brand{align-items:center}
+.brand span{margin-inline-start:auto}
+.langbtn{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:20px;padding:4px 12px;font:inherit;font-size:13px;cursor:pointer}
+.langbtn:hover{border-color:var(--accent)}
+ul.clean li{padding-left:0;padding-inline-start:18px}
+ul.clean li::before{left:auto;inset-inline-start:0}
+.opts button{text-align:start}
+.anchors span:nth-child(3){text-align:end}
+.scenario{border-left:0;border-inline-start:3px solid var(--ochre)}
+[dir=rtl] .scenario{border-radius:12px 0 0 12px}
+[dir=rtl] body,[dir=rtl] button,[dir=rtl] input,[dir=rtl] textarea{font-family:"IBM Plex Sans Arabic",var(--sans)}
+[dir=rtl] h1,[dir=rtl] h2,[dir=rtl] .scenario,[dir=rtl] .facts b,[dir=rtl] .bignum,[dir=rtl] .brand b{font-family:"IBM Plex Sans Arabic",var(--sans);font-weight:600;letter-spacing:0}
+[dir=rtl] .eyebrow,[dir=rtl] h3,[dir=rtl] .stepper div{letter-spacing:0;text-transform:none}
+[dir=rtl] .lead{line-height:1.75}
+@media (max-width:560px){.brand span{display:none}.langbtn{margin-inline-start:auto}}
+</style>
+</head>
+<body>
+
+
+
+<header class="bar"><div class="bar-in">
+  <div class="brand"><b id="brandName"></b><span id="brandDept"></span><button type="button" class="langbtn" id="langBtn"></button></div>
+  <div class="stepper" id="stepper"></div>
+</div></header>
+<main id="app" aria-live="polite"></main>
+<div class="actions" id="actions" hidden><div class="actions-in"><button class="btn ghost" id="backBtn" type="button"></button><span class="hint" id="hint"></span><button class="btn primary" id="nextBtn" type="button"></button></div></div>
+<div id="stage" hidden></div>
+<div id="wbar" hidden><i id="wfill"></i></div>
+<div id="wlabel" hidden></div>
+<div id="sidelab" hidden></div>
+<button id="skip" hidden></button>
+
+<script>
+"use strict";
+/* ================= SETTINGS (edit these) ================= */
+const CONFIG = {
+  // Paste the Google Apps Script web app URL here once it is deployed. While it is empty, the survey runs in test mode and saves nothing.
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbytZegMmbhJpMc0GCP50AZfHx1acwBWErpeEKKpgK_Zlgh0Bt_CCsqIF1quFFcZIcIE5A/exec",
+  WALK_SECONDS: 16,
+  CONTACT_EMAIL: "",          // optional: shown on the first page if filled in
+  ETHICS_NOTE: "",            // optional: e.g. the IRB approval number (shown as written)
+  VERSION_PHOTOS_READY: true  // the edited Mahmoud Bassiouny photos are in img/B, img/C and img/D
+};
+/* ========================================================= */
+const STREETS = {"mb":{"name":"Mahmoud Bassiouny","level":"High","rank":1,"seq":[{"src":"img/mb_L1.jpg","side":"Left","id":"L1","name":"stepped apartment block","w":960,"h":1280},{"src":"img/mb_R1.jpg","side":"Right","id":"R1","name":"ornate four-bay frontage","w":960,"h":1280},{"src":"img/mb_L2.jpg","side":"Left","id":"L2","name":"modern ribbed facade with right-hand balconies","w":960,"h":1280},{"src":"img/mb_R2.jpg","side":"Right","id":"R2","name":"recessed-balcony main frontage","w":960,"h":1280},{"src":"img/mb_L3.jpg","side":"Left","id":"L3","name":"two-storey commercial frontage","w":960,"h":1280},{"src":"img/mb_R3.jpg","side":"Right","id":"R3","name":"two-storey commercial frontage","w":960,"h":1280},{"src":"img/mb_L4.jpg","side":"Left","id":"L4","name":"rounded corner block","w":960,"h":1280},{"src":"img/mb_R4.jpg","side":"Right","id":"R4","name":"seven-bay main frontage","w":960,"h":1280}]},"th1":{"name":"Talaat Harb 1","level":"High","rank":2,"seq":[{"src":"img/th1_L1.jpg","side":"Left","id":"L1","name":"low curved-front block","w":960,"h":1280},{"src":"img/th1_R1.jpg","side":"Right","id":"R1","name":"pale eight-storey commercial and residential block","w":960,"h":1280},{"src":"img/th1_L2.jpg","side":"Left","id":"L2","name":"pale corner block","w":960,"h":1280},{"src":"img/th1_R2.jpg","side":"Right","id":"R2","name":"five-bay Belle \u00c9poque block","w":960,"h":1280},{"src":"img/th1_L3.jpg","side":"Left","id":"L3","name":"central ribbon-window block","w":960,"h":1280},{"src":"img/th1_R3.jpg","side":"Right","id":"R3","name":"five-storey beige balcony block","w":960,"h":1280},{"src":"img/th1_L4.jpg","side":"Left","id":"L4","name":"modern stepped tower","w":960,"h":1280},{"src":"img/th1_R4.jpg","side":"Right","id":"R4","name":"central five-storey balcony block","w":960,"h":1280},{"src":"img/th1_L5.jpg","side":"Left","id":"L5","name":"ornate nine-bay historic block","w":960,"h":1280},{"src":"img/th1_R5.jpg","side":"Right","id":"R5","name":"perforated-screen modernist block","w":960,"h":1280}]},"kan1":{"name":"Kasr Al Nile 1","level":"Medium","rank":3,"seq":[{"src":"img/kan1_L1.jpg","side":"Left","id":"L1","name":"ornate ten-bay historic frontage","w":960,"h":1280},{"src":"img/kan1_R1.jpg","side":"Right","id":"R1","name":"main-street frontage","w":960,"h":1280},{"src":"img/kan1_L2.jpg","side":"Left","id":"L2","name":"apartment block with arched entrance","w":960,"h":1280},{"src":"img/kan1_R2.jpg","side":"Right","id":"R2","name":"rounded-balcony main frontage","w":960,"h":1280},{"src":"img/kan1_L3.jpg","side":"Left","id":"L3","name":"ornate entrance tower and three-bay facade","w":960,"h":1280},{"src":"img/kan1_R3.jpg","side":"Right","id":"R3","name":"Emirates NBD bank frontage","w":960,"h":1280},{"src":"img/kan1_L4.jpg","side":"Left","id":"L4","name":"three-storey commercial facade","w":960,"h":1280},{"src":"img/kan1_L5.jpg","side":"Left","id":"L5","name":"ornate corner block","w":960,"h":1280}]},"kan2":{"name":"Kasr Al Nile 2","level":"Medium","rank":4,"seq":[{"src":"img/kan2_L1.jpg","side":"Left","id":"L1","name":"stepped-frontage corner block","w":960,"h":1280},{"src":"img/kan2_R1.jpg","side":"Right","id":"R1","name":"ochre Belle \u00c9poque frontage","w":960,"h":1280},{"src":"img/kan2_L2.jpg","side":"Left","id":"L2","name":"curved ochre frontage","w":960,"h":1280},{"src":"img/kan2_R2.jpg","side":"Right","id":"R2","name":"main-street elevation","w":960,"h":1280},{"src":"img/kan2_L3.jpg","side":"Left","id":"L3","name":"corner block, main frontage","w":960,"h":1280},{"src":"img/kan2_L4.jpg","side":"Left","id":"L4","name":"principal street frontage","w":960,"h":1280}]},"msa":{"name":"Mohammed Sabri Abou Alam","level":"Low","rank":5,"seq":[{"src":"img/msa_L1.jpg","side":"Left","id":"L1","name":"main-street frontage","w":960,"h":1280},{"src":"img/msa_R1.jpg","side":"Right","id":"R1","name":"main frontage beyond corner pier","w":960,"h":1280},{"src":"img/msa_L2.jpg","side":"Left","id":"L2","name":"church street frontage","w":960,"h":1280},{"src":"img/msa_R2.jpg","side":"Right","id":"R2","name":"four-storey street frontage","w":960,"h":1280},{"src":"img/msa_L3.jpg","side":"Left","id":"L3","name":"seven-storey main-street frontage","w":960,"h":1280},{"src":"img/msa_R3.jpg","side":"Right","id":"R3","name":"main frontage of corner block","w":960,"h":1280},{"src":"img/msa_L4.jpg","side":"Left","id":"L4","name":"ochre frontage with rounded corner bay","w":960,"h":1280}]},"th2":{"name":"Talaat Harb 2","level":"Low","rank":6,"seq":[{"src":"img/th2_L1.jpg","side":"Left","id":"L1","name":"rounded-corner block","w":960,"h":1280},{"src":"img/th2_R1.jpg","side":"Right","id":"R1","name":"narrow curved frontage","w":960,"h":1280},{"src":"img/th2_L2.jpg","side":"Left","id":"L2","name":"corner block with rooftop pergola","w":960,"h":1280},{"src":"img/th2_R2.jpg","side":"Right","id":"R2","name":"restaurant frontage","w":960,"h":1280},{"src":"img/th2_L3.jpg","side":"Left","id":"L3","name":"twin projecting-bay commercial block","w":960,"h":1280},{"src":"img/th2_R3.jpg","side":"Right","id":"R3","name":"main-street frontage","w":960,"h":1280},{"src":"img/th2_L4.jpg","side":"Left","id":"L4","name":"ochre corner block","w":960,"h":1280},{"src":"img/th2_R4.jpg","side":"Right","id":"R4","name":"Valencia Burger frontage","w":960,"h":1280},{"src":"img/th2_R5.jpg","side":"Right","id":"R5","name":"Cine Radio","w":960,"h":1280},{"src":"img/th2_R6.jpg","side":"Right","id":"R6","name":"twin-turret main frontage","w":960,"h":1280}]}};
+const PART1 = ["mb","th1","kan1","kan2","msa","th2"];
+const PART2 = ["mb_b","mb_c","mb_d"];
+const TEST = !CONFIG.SCRIPT_URL;
+
+/* ---------- text in English and Arabic (answers are always saved in English) ---------- */
+const TXT = {
+en:{
+  dir:"ltr", switchTo:"العربية", brand:"Downtown Streets Study", dept:"Department of Architecture · The American University in Cairo",
+  sections:["About you","Six streets","Three versions","Final questions"],
+  back:"Back", cont:"Continue", answerAll:"Please answer every question", skip:"Skip walk",
+  left:"Left side of the street", right:"Right side of the street", testbar:"Test copy: answers are not saved",
+  heroCap:"Streets around Talaat Harb Square", eyebrowStudy:"Research study",
+  h1:"How do Downtown's streets feel to walk through?",
+  lead:"This study is part of a dissertation in architecture at The American University in Cairo. It looks at how the facades of Downtown Cairo's buildings affect how mentally tiring a street feels, and whether this differs between people who use Downtown every day and people who rarely go there.",
+  facts:[["10 min","to complete"],["9","short street walks"],["Anonymous","no name or contact details"]],
+  doH:"What you will do", doL:["Answer a few questions about yourself and how often you go to Downtown.","Watch nine walks along streets near Talaat Harb Square, each about 15 seconds. Some show buildings that have been changed digitally.","After each walk, answer six short questions about how the street feels."],
+  whoH:"Who can take part", whoP:"Anyone aged 18 or over. The study is especially interested in people who are in Downtown Cairo most days and in people who rarely go there.", whoM:"There are no right or wrong answers, and this is not a test of what you know about Downtown.",
+  privH:"Your privacy", privL:["The survey does not ask for your name, phone number or email, and does not record your location.","Answers are kept in a private file that only the researcher can open, used only for this dissertation and reported as group results."],
+  choiceH:"Your choice", choiceP:"Taking part is voluntary. You can stop at any time by closing the page, and nothing will be saved. There are no risks beyond those of normal screen use.", choiceM:"For the best view, use a quiet moment and turn the screen brightness up.",
+  researcher:"Researcher: Nada Abdelhamid, Department of Architecture, The American University in Cairo.", contact:"Questions about the study:",
+  agree:"I am 18 or older, I have read the information above, and I agree to take part.", begin:"Begin", tick:"Tick the box to agree",
+  part:(n,s)=>`Part ${n} of 4 · ${s}`,
+  aboutH:"A few questions about you", age:"How old are you?", lives:"Do you live in Greater Cairo?",
+  livesDef:"Greater Cairo means the cities of Cairo, Giza and Shubra El Kheima and the areas around them, including New Cairo, Nasr City, Heliopolis, Maadi, Helwan, 6th of October and Sheikh Zayed.",
+  freq:"How often are you in Downtown Cairo, the area around Talaat Harb Square?", dur:"For how long have you been going to Downtown this often?", durHint:"If you rarely go, choose the closest answer.",
+  under18H:"Thank you for your interest", under18P:"This study is for people aged 18 and over, so the survey ends here.",
+  beforeH:"Before the walks", beforeLead:"Read this carefully and keep it in mind during every walk.",
+  scenario:"Imagine it is late afternoon and you are walking home alone after a long day of work or study. You are mentally tired from concentrating all day.",
+  walksH:"The walks", walksP:"Each walk plays by itself for about 15 seconds: first the buildings on the left side of the street slide past, then the view turns to the right side. Please watch to the end if you can; a skip button is there if you need it.",
+  qsH:"The questions", qsP:"After each walk, say how far you agree with six statements, from 1 (strongly disagree) to 7 (strongly agree). Go with your first impression.",
+  startWalks:"Start the walks",
+  moreH:"Three more walks", moreP:"The next walks follow the same steps. Keep imagining that you are walking home mentally tired.",
+  walk:"Walk", remind:"Remember: it is late afternoon, and you are walking home mentally tired after a long day.", startWalk:"Start walk",
+  walkOf:(i,n)=>`Walk ${i} of ${n}`, rateH:"How would walking along this street feel?",
+  fatigue:["Taking in this street would tire my mind.","It is hard to focus on any one thing here.","I would want to look away from this street.","Everything here seems to have its proper place."],
+  like:"I like this street.", anchors:["Strongly disagree","Neutral","Strongly agree"], recog:"Do you recognise this street?",
+  nextWalk:"Next walk",
+  prefH:"Which version of this street would you prefer to walk along when you are mentally tired?", prefP:"These are four versions of the same street from the walks. Choose one.", prefLabel:k=>`Street ${"ABCD"[k]}`, prefHint:"Choose one version",
+  lastH:"Last few questions", gender:"Gender", occ:"Occupation", area:"Which area of Greater Cairo do you live in?", areaPh:"For example: Dokki, Nasr City, Maadi",
+  reason:"If you go to Downtown regularly, what is the main reason?", comment:"Anything you would like to add about the streets you saw?", optional:"(optional)", submit:"Submit answers",
+  savingH:"Saving your answers…", savingP:"Please keep this page open for a moment.",
+  failH:"Your answers were not sent", failP:"The connection may have dropped. Check that you are online, then try again.", retry:"Try again",
+  doneEb:"Complete", doneH:"Thank you for taking part", doneP:"Your answers have been saved. You can now close this page.", doneTest:"Your answers have been recorded in test mode, so nothing was saved.",
+  aboutStudyH:"About this study", aboutStudyP:"Your answers will help show which facade qualities make Downtown streets more or less tiring to walk through, and how restoration could take this into account. If you know someone who is in Downtown every day, or someone who rarely goes, you are welcome to share the survey with them.",
+  alreadyH:"You have already taken part", alreadyP:"Thank you. Your answers were saved earlier, so you do not need to take the survey again."
+},
+ar:{
+  dir:"rtl", switchTo:"English", brand:"دراسة شوارع وسط البلد", dept:"قسم العمارة · الجامعة الأمريكية بالقاهرة",
+  sections:["عنك","ستة شوارع","ثلاث نسخ","أسئلة أخيرة"],
+  back:"رجوع", cont:"متابعة", answerAll:"يُرجى الإجابة عن كل الأسئلة", skip:"تخطي الجولة",
+  left:"الجانب الأيسر من الشارع", right:"الجانب الأيمن من الشارع", testbar:"نسخة تجريبية: لا يتم حفظ الإجابات",
+  heroCap:"شوارع حول ميدان طلعت حرب", eyebrowStudy:"دراسة بحثية",
+  h1:"كيف تشعر وأنت تمشي في شوارع وسط البلد؟",
+  lead:"هذا الاستبيان جزء من رسالة تخرج في العمارة بالجامعة الأمريكية بالقاهرة. يدرس كيف تؤثر واجهات المباني في وسط القاهرة على مدى الإرهاق الذهني الذي يسببه الشارع، وهل يختلف ذلك بين من يستخدمون وسط البلد يوميًا ومن نادرًا ما يذهبون إليه.",
+  facts:[["١٠ دقائق","لإكمال الاستبيان"],["٩","جولات قصيرة في الشوارع"],["دون هوية","لا نطلب اسمًا أو بيانات اتصال"]],
+  doH:"ما الذي ستفعله", doL:["الإجابة عن بعض الأسئلة عنك وعن عدد مرات ذهابك إلى وسط البلد.","مشاهدة تسع جولات في شوارع قريبة من ميدان طلعت حرب، مدة كل منها حوالي ١٥ ثانية. بعضها يعرض مباني عُدّلت رقميًا.","بعد كل جولة، الإجابة عن ستة أسئلة قصيرة عن إحساسك بالشارع."],
+  whoH:"من يمكنه المشاركة", whoP:"أي شخص عمره ١٨ عامًا أو أكثر. تهتم الدراسة بشكل خاص بمن يتواجدون في وسط القاهرة معظم الأيام وبمن نادرًا ما يذهبون إليه.", whoM:"لا توجد إجابات صحيحة أو خاطئة، وهذا ليس اختبارًا لمعرفتك بوسط البلد.",
+  privH:"خصوصيتك", privL:["لا يطلب الاستبيان اسمك أو رقم هاتفك أو بريدك الإلكتروني، ولا يسجل موقعك.","تُحفظ الإجابات في ملف خاص لا يطّلع عليه إلا الباحثة، وتُستخدم فقط لهذه الرسالة وتُعرض كنتائج مجمّعة."],
+  choiceH:"المشاركة اختيارية", choiceP:"يمكنك التوقف في أي وقت بإغلاق الصفحة، ولن يُحفظ أي شيء. لا توجد مخاطر سوى المعتادة عند استخدام الشاشة.", choiceM:"للحصول على أفضل مشاهدة، اختر وقتًا هادئًا وارفع سطوع الشاشة.",
+  researcher:"الباحثة: ندى عبد الحميد، قسم العمارة، الجامعة الأمريكية بالقاهرة.", contact:"للاستفسار عن الدراسة:",
+  agree:"عمري ١٨ عامًا أو أكثر، وقد قرأت المعلومات أعلاه، وأوافق على المشاركة.", begin:"ابدأ", tick:"ضع علامة في المربع للموافقة",
+  part:(n,s)=>`الجزء ${"٠١٢٣٤"[n]} من ٤ · ${s}`,
+  aboutH:"بعض الأسئلة عنك", age:"كم عمرك؟", lives:"هل تسكن في القاهرة الكبرى؟",
+  livesDef:"القاهرة الكبرى تشمل مدن القاهرة والجيزة وشبرا الخيمة والمناطق المحيطة بها، ومنها القاهرة الجديدة ومدينة نصر ومصر الجديدة والمعادي وحلوان و٦ أكتوبر والشيخ زايد.",
+  freq:"كم مرة تتواجد في وسط القاهرة، أي المنطقة حول ميدان طلعت حرب؟", dur:"منذ متى تذهب إلى وسط البلد بهذا المعدل؟", durHint:"إذا كنت نادرًا ما تذهب، اختر أقرب إجابة.",
+  under18H:"شكرًا لاهتمامك", under18P:"هذه الدراسة لمن هم في سن ١٨ عامًا فأكثر، لذلك ينتهي الاستبيان هنا.",
+  beforeH:"قبل الجولات", beforeLead:"اقرأ هذا بعناية وتذكّره خلال كل جولة.",
+  scenario:"تخيّل أن الوقت آخر النهار وأنك تمشي وحدك عائدًا إلى بيتك بعد يوم طويل من العمل أو الدراسة. أنت مرهق ذهنيًا من التركيز طوال اليوم.",
+  walksH:"الجولات", walksP:"تعمل كل جولة تلقائيًا لمدة حوالي ١٥ ثانية: تمر أولًا مباني الجانب الأيسر من الشارع، ثم يلتفت المشهد إلى الجانب الأيمن. يُرجى مشاهدة الجولة حتى نهايتها إن أمكن، ويوجد زر للتخطي عند الحاجة.",
+  qsH:"الأسئلة", qsP:"بعد كل جولة، حدّد مدى موافقتك على ست عبارات، من ١ (لا أوافق إطلاقًا) إلى ٧ (أوافق تمامًا). اعتمد على انطباعك الأول.",
+  startWalks:"ابدأ الجولات",
+  moreH:"ثلاث جولات أخرى", moreP:"الجولات التالية بنفس الخطوات. استمر في تخيّل أنك عائد إلى بيتك وأنت مرهق ذهنيًا.",
+  walk:"جولة", remind:"تذكّر: الوقت آخر النهار، وأنت عائد إلى بيتك مرهقًا ذهنيًا بعد يوم طويل.", startWalk:"ابدأ الجولة",
+  walkOf:(i,n)=>`الجولة ${i} من ${n}`, rateH:"كيف سيكون شعورك وأنت تمشي في هذا الشارع؟",
+  fatigue:["استيعاب هذا الشارع سيُتعب ذهني.","من الصعب التركيز على أي شيء واحد هنا.","سأرغب في أن أُبعد نظري عن هذا الشارع.","كل شيء هنا يبدو في مكانه الصحيح."],
+  like:"يعجبني هذا الشارع.", anchors:["لا أوافق إطلاقًا","محايد","أوافق تمامًا"], recog:"هل تعرف هذا الشارع؟",
+  nextWalk:"الجولة التالية",
+  prefH:"أي نسخة من هذا الشارع تفضّل أن تمشي فيها وأنت مرهق ذهنيًا؟", prefP:"هذه أربع نسخ من نفس الشارع من الجولات. اختر واحدة.", prefLabel:k=>`الشارع ${"أبجد"[k]}`, prefHint:"اختر نسخة واحدة",
+  lastH:"آخر بعض الأسئلة", gender:"النوع", occ:"المهنة", area:"في أي منطقة من القاهرة الكبرى تسكن؟", areaPh:"مثال: الدقي، مدينة نصر، المعادي",
+  reason:"إذا كنت تذهب إلى وسط البلد بانتظام، ما السبب الرئيسي؟", comment:"هل تودّ إضافة أي شيء عن الشوارع التي رأيتها؟", optional:"(اختياري)", submit:"إرسال الإجابات",
+  savingH:"جارٍ حفظ إجاباتك…", savingP:"يُرجى إبقاء هذه الصفحة مفتوحة لحظة.",
+  failH:"لم تُرسَل إجاباتك", failP:"ربما انقطع الاتصال. تأكد من اتصالك بالإنترنت ثم حاول مرة أخرى.", retry:"حاول مرة أخرى",
+  doneEb:"اكتمل", doneH:"شكرًا لمشاركتك", doneP:"تم حفظ إجاباتك. يمكنك الآن إغلاق هذه الصفحة.", doneTest:"تم تسجيل إجاباتك في وضع التجربة، لذلك لم يُحفظ شيء.",
+  aboutStudyH:"عن هذه الدراسة", aboutStudyP:"ستساعد إجاباتك في توضيح أي خصائص في الواجهات تجعل شوارع وسط البلد أكثر أو أقل إرهاقًا عند المشي فيها، وكيف يمكن أن يراعي الترميم ذلك. إذا كنت تعرف شخصًا يتواجد في وسط البلد يوميًا، أو شخصًا نادرًا ما يذهب إليه، يمكنك مشاركة الاستبيان معه.",
+  alreadyH:"لقد شاركت بالفعل", alreadyP:"شكرًا لك. تم حفظ إجاباتك من قبل، فلا داعي لإعادة الاستبيان."
+}};
+/* answer options: saved value (English) → Arabic label */
+const OPT_AR = {
+  "Yes":"نعم","No":"لا","Not sure":"لست متأكدًا",
+  "4 or more days a week":"٤ أيام أو أكثر في الأسبوع","1–3 days a week":"١–٣ أيام في الأسبوع","1–3 times a month":"١–٣ مرات في الشهر","Less than once a month":"أقل من مرة في الشهر",
+  "Less than 6 months":"أقل من ٦ أشهر","6 months to 2 years":"من ٦ أشهر إلى سنتين","More than 2 years":"أكثر من سنتين",
+  "Female":"أنثى","Male":"ذكر","Prefer not to say":"أفضّل عدم الإجابة",
+  "Student":"طالب/ة","Employed":"موظف/ة","Self-employed":"أعمل لحسابي","Not working":"لا أعمل","Other":"أخرى",
+  "Work":"العمل","Study":"الدراسة","Living there":"أسكن هناك","Shopping or leisure":"التسوق أو الترفيه","I don't go regularly":"لا أذهب بانتظام"
+};
+let LANG="en"; try{ const s=localStorage.getItem("dtsurvey_lang"); if(s) LANG=s; else if((navigator.language||"").toLowerCase().startsWith("ar")) LANG="ar"; }catch(e){}
+const T=()=>TXT[LANG];
+const optLabel=v=>LANG==="ar"?(OPT_AR[v]||v):v;
+const num=n=>LANG==="ar"?String(n).replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[d]):String(n);
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const pid=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random()).slice(0,13);
+const R = { participant_id:pid, started_at:new Date().toISOString(), test_mode:TEST, device:(matchMedia("(pointer:coarse)").matches?"touch":"mouse")+" "+innerWidth+"x"+innerHeight };
+const order1 = shuffle(PART1), order2 = shuffle(PART2);
+R.order_part1 = order1.join(" "); R.order_part2 = order2.join(" ");
+const PREF_ORDER=shuffle(["mb","mb_b","mb_c","mb_d"]); R.prefer_option_order=PREF_ORDER.join(" ");
+
+function seq(code){
+  if(code.startsWith("mb_")){
+    const v=code.slice(3).toUpperCase(), base=STREETS.mb.seq;
+    if(!CONFIG.VERSION_PHOTOS_READY) return {seq:base};
+    return {seq:base.map(s=>({...s,src:s.src.replace("img/","img/"+v+"/")}))};
+  }
+  return {seq:STREETS[code].seq};
+}
+
+/* ---------- language ---------- */
+function applyLang(){
+  const t=T(); document.documentElement.lang=LANG==="ar"?"ar":"en-GB"; document.documentElement.dir=t.dir;
+  $("brandName").textContent=t.brand; $("brandDept").textContent=t.dept; $("langBtn").textContent=t.switchTo;
+  $("langBtn").lang=LANG==="ar"?"en":"ar";
+  $("backBtn").textContent=t.back; $("skip").textContent=t.skip;
+  const tb=document.querySelector(".testbar"); if(tb) tb.textContent=t.testbar;
+}
+$("langBtn").onclick=()=>{ LANG=LANG==="en"?"ar":"en"; try{localStorage.setItem("dtsurvey_lang",LANG);}catch(e){} applyLang(); renderStepper(); if(current) current(); };
+let current=null;
+
+/* ---------- flow ---------- */
+const ALL=[...order1.map(c=>({code:c,part:1})),...order2.map(c=>({code:c,part:2}))];
+const FLOW=[{type:"consent",sec:0},{type:"screening",sec:0},{type:"scenario",sec:1}];
+ALL.forEach((it,i)=>{ if(i===order1.length) FLOW.push({type:"part2",sec:2}); const sec=it.part===1?1:2; FLOW.push({type:"walk",i,sec},{type:"rate",i,sec}); });
+FLOW.push({type:"prefer",sec:2},{type:"background",sec:3});
+let pos=0, finished=false;
+function go(p){ pos=p; const f=FLOW[p]; renderStepper();
+  current=({consent,screening,scenario,part2,walk:()=>walkStart(f.i),rate:()=>rate(f.i),prefer,background})[f.type]; current(); }
+function next(){ go(pos+1); }
+function back(){ let p=pos-1; while(p>0 && FLOW[p].type==="walk") p--; go(Math.max(0,p)); }
+function renderStepper(){
+  const sec=finished?4:FLOW[pos].sec;
+  $("stepper").innerHTML=T().sections.map((s,k)=>{ const items=FLOW.filter(f=>f.sec===k), idx=FLOW.slice(0,pos+1).filter(f=>f.sec===k).length;
+    const pct=finished||k<sec?100:k>sec?0:Math.round(100*idx/items.length);
+    return `<div class="${k===sec?"now":""}"><i><b style="width:${pct}%"></b></i>${s}</div>`; }).join("");
+}
+function screen(html,{next:nxt=null,nextLabel,back:bk=true,hint=""}={}){
+  window.scrollTo(0,0);
+  $("app").innerHTML=`<div class="screen">${html}</div>`;
+  const a=$("actions");
+  if(!nxt){ a.hidden=true; return; }
+  a.hidden=false; $("nextBtn").textContent=nextLabel||T().cont; $("nextBtn").onclick=nxt; $("nextBtn").disabled=false;
+  $("backBtn").style.visibility=(bk&&pos>0)?"visible":"hidden"; $("backBtn").onclick=back;
+  $("hint").textContent=hint;
+}
+const setReady=(ok,hint)=>{ $("nextBtn").disabled=!ok; $("hint").textContent=ok?"":(hint||T().answerAll); };
+function choice(id,opts,row=false,cur){ return `<div class="opts${row?" row":""}" data-q="${id}" role="radiogroup">${opts.map(o=>`<button type="button" role="radio" aria-checked="${cur===o}" data-v="${esc(o)}" class="${cur===o?"on":""}">${esc(optLabel(o))}</button>`).join("")}</div>`; }
+function wireChoices(store,onChange){
+  document.querySelectorAll(".opts").forEach(g=>g.querySelectorAll("button").forEach(b=>b.onclick=()=>{
+    g.querySelectorAll("button").forEach(x=>{x.classList.toggle("on",x===b);x.setAttribute("aria-checked",x===b);}); store[g.dataset.q]=b.dataset.v; onChange&&onChange(); }));
+}
+
+/* ---------- screens ---------- */
+function consent(){
+  const t=T();
+  const hero=[...STREETS.th2.seq,...STREETS.kan2.seq,...STREETS.mb.seq].slice(0,10);
+  const imgs=hero.map(x=>`<img alt="" src="${x.src}">`).join("");
+  const agreed=R.consent==="yes";
+  screen(`
+  <div class="hero" aria-hidden="true"><div class="track">${imgs}${imgs}</div><span>${t.heroCap}</span></div>
+  <div><p class="eyebrow">${t.eyebrowStudy}</p><h1>${t.h1}</h1></div>
+  <p class="lead">${t.lead}</p>
+  <div class="facts">${t.facts.map(([a,b])=>`<div><b>${a}</b><span>${b}</span></div>`).join("")}</div>
+  <div class="cols">
+    <div class="panel"><h3>${t.doH}</h3><ul class="clean">${t.doL.map(x=>`<li>${x}</li>`).join("")}</ul></div>
+    <div class="panel"><h3>${t.whoH}</h3><p>${t.whoP}</p><p class="muted">${t.whoM}</p></div>
+    <div class="panel"><h3>${t.privH}</h3><ul class="clean">${t.privL.map(x=>`<li>${x}</li>`).join("")}</ul></div>
+    <div class="panel"><h3>${t.choiceH}</h3><p>${t.choiceP}</p><p class="muted">${t.choiceM}</p></div>
+  </div>
+  <p class="muted">${t.researcher}${CONFIG.CONTACT_EMAIL?` ${t.contact} <span dir="ltr" style="user-select:all">${esc(CONFIG.CONTACT_EMAIL)}</span>`:""}${CONFIG.ETHICS_NOTE?` ${esc(CONFIG.ETHICS_NOTE)}`:""}</p>
+  <label class="check"><input type="checkbox" id="agree" ${agreed?"checked":""}><span>${t.agree}</span></label>`,
+  {next:()=>{R.consent="yes"; next();},nextLabel:t.begin,back:false});
+  const sync=()=>setReady($("agree").checked,T().tick);
+  $("agree").onchange=sync; sync();
+}
+
+function screening(){
+  const t=T(), A={lives_cairo:R.lives_cairo,dt_frequency:R.dt_frequency,dt_duration:R.dt_duration};
+  const ageVal=R._age_draft??R.age??"";
+  screen(`<div><p class="eyebrow">${t.part(1,t.sections[0])}</p><h2>${t.aboutH}</h2></div>
+  <div class="panel">
+  <div class="q"><label class="t" for="age">${t.age}</label><input type="number" id="age" inputmode="numeric" min="10" max="99" value="${ageVal}"></div>
+  <div class="q"><span class="t">${t.lives}</span><span class="muted">${t.livesDef}</span>${choice("lives_cairo",["Yes","No"],true,A.lives_cairo)}</div>
+  <div class="q"><span class="t">${t.freq}</span>${choice("dt_frequency",["4 or more days a week","1–3 days a week","1–3 times a month","Less than once a month"],false,A.dt_frequency)}</div>
+  <div class="q"><span class="t">${t.dur}</span><span class="muted">${t.durHint}</span>${choice("dt_duration",["Less than 6 months","6 months to 2 years","More than 2 years"],false,A.dt_duration)}</div>
+  </div>`,{next:()=>{
+    const age=+$("age").value; Object.assign(R,A,{age}); delete R._age_draft;
+    let group="occasional_visitor";
+    if(A.dt_frequency==="4 or more days a week" && A.dt_duration!=="Less than 6 months") group="daily_user";
+    else if(A.dt_frequency==="Less than once a month") group="infrequent_visitor";
+    R.group=group; R.in_age_range=(age>=18&&age<=35)?"yes":"no";
+    if(age<18){ submit(true); current=()=>screen(`<h2>${T().under18H}</h2><p class="lead">${T().under18P}</p>`); current(); return; }
+    next(); }});
+  const check=()=>{ const age=+$("age").value; R._age_draft=$("age").value; Object.assign(R,{lives_cairo:A.lives_cairo,dt_frequency:A.dt_frequency,dt_duration:A.dt_duration}); setReady(age>0 && A.lives_cairo && A.dt_frequency && A.dt_duration); };
+  wireChoices(A,check); $("age").oninput=check; check();
+}
+
+function scenario(){
+  const t=T();
+  screen(`<div><p class="eyebrow">${t.part(2,t.sections[1])}</p><h2>${t.beforeH}</h2></div>
+  <p class="lead">${t.beforeLead}</p>
+  <div class="scenario">${t.scenario}</div>
+  <div class="cols"><div class="panel"><h3>${t.walksH}</h3><p>${t.walksP}</p></div><div class="panel"><h3>${t.qsH}</h3><p>${t.qsP}</p></div></div>`,{next,nextLabel:t.startWalks});
+}
+function part2(){ const t=T(); screen(`<div><p class="eyebrow">${t.part(3,t.sections[2])}</p><h2>${t.moreH}</h2></div><p class="lead">${t.moreP}</p>`,{next}); }
+
+function walkStart(i){
+  const t=T(), item=ALL[i];
+  screen(`<div><p class="eyebrow">${item.part===1?t.part(2,t.sections[1]):t.part(3,t.sections[2])}</p></div>
+  <div class="panel" style="align-items:flex-start;gap:10px"><span class="walknum">${t.walk}</span><div class="bignum">${num(i+1)}<span class="muted" style="font-size:20px"> / ${num(ALL.length)}</span></div><p>${t.remind}</p></div>`,
+  {next:()=>playWalk(item.code,(watched,skipped)=>{ R[`${item.code}_watched_seconds`]=watched; R[`${item.code}_skipped`]=skipped?"yes":"no"; next(); }),nextLabel:t.startWalk});
+}
+
+const DRAFT={};
+function rate(i){
+  const t=T(), item=ALL[i], p=item.code, t0=performance.now();
+  const A=DRAFT[p]||(DRAFT[p]={}); for(const k of ["f1","f2","f3","f4","like"]) if(R[`${p}_${k}`]&&!A[k]) A[k]=R[`${p}_${k}`]; if(R[`${p}_recognise`]&&!A.recognise) A.recognise=R[`${p}_recognise`];
+  const thumbs=seq(p).seq.slice(0,6).map(x=>`<img alt="" src="${x.src}">`).join("");
+  const likert=(id,text)=>`<div class="q"><span class="t">${esc(text)}</span><div class="likert" data-q="${id}" role="radiogroup" aria-label="${esc(text)}">${[1,2,3,4,5,6,7].map(n=>`<button type="button" role="radio" aria-checked="${A[id]===n}" data-v="${n}" class="${A[id]===n?"on":""}">${num(n)}</button>`).join("")}</div><div class="anchors"><span>${t.anchors[0]}</span><span>${t.anchors[1]}</span><span>${t.anchors[2]}</span></div></div>`;
+  screen(`<div><p class="eyebrow">${t.walkOf(num(i+1),num(ALL.length))}</p><h2>${t.rateH}</h2></div>
+  <div class="thumbs" aria-hidden="true">${thumbs}</div>
+  <div class="panel">${t.fatigue.map((s,k)=>likert("f"+(k+1),s)).join("")}${likert("like",t.like)}
+  <div class="q"><span class="t">${t.recog}</span>${choice("recognise",["Yes","Not sure","No"],true,A.recognise)}</div></div>`,
+  {next:()=>{
+    R[`${p}_position`]=i+1;
+    for(const k of ["f1","f2","f3","f4","like"]) R[`${p}_${k}`]=A[k];
+    R[`${p}_fatigue`]=+(((A.f1+A.f2+A.f3+(8-A.f4))/4).toFixed(2));
+    R[`${p}_recognise`]=A.recognise;
+    R[`${p}_answer_seconds`]=(R[`${p}_answer_seconds`]||0)+Math.round((performance.now()-t0)/1000);
+    next(); },nextLabel:i===ALL.length-1?t.cont:t.nextWalk});
+  const check=()=>setReady(["f1","f2","f3","f4","like","recognise"].every(k=>A[k]));
+  document.querySelectorAll(".likert").forEach(g=>g.querySelectorAll("button").forEach(b=>b.onclick=()=>{ g.querySelectorAll("button").forEach(x=>{x.classList.toggle("on",x===b);x.setAttribute("aria-checked",x===b);}); A[g.dataset.q]=+b.dataset.v; check(); }));
+  wireChoices(A,check); check();
+}
+
+function prefer(){
+  const t=T(); let pick=R._pref_draft||R.prefer_choice||null;
+  const opt=(code,k)=>`<button type="button" class="pref${pick===code?" on":""}" data-v="${code}" role="radio" aria-checked="${pick===code}">
+    <span class="pthumbs">${seq(code).seq.slice(0,4).map(x=>`<img alt="" src="${x.src}">`).join("")}</span><span class="plabel">${t.prefLabel(k)}</span></button>`;
+  screen(`<div><p class="eyebrow">${t.part(3,t.sections[2])}</p><h2>${t.prefH}</h2></div><p class="muted">${t.prefP}</p>
+  <div class="prefs" role="radiogroup">${PREF_ORDER.map(opt).join("")}</div>`,
+  {next:()=>{ R.prefer_choice=pick; R.prefer_position=PREF_ORDER.indexOf(pick)+1; delete R._pref_draft; next(); }});
+  const check=()=>setReady(!!pick,T().prefHint);
+  document.querySelectorAll(".pref").forEach(b=>b.onclick=()=>{ pick=b.dataset.v; R._pref_draft=pick; document.querySelectorAll(".pref").forEach(x=>{x.classList.toggle("on",x===b);x.setAttribute("aria-checked",x===b);}); check(); });
+  check();
+}
+
+function background(){
+  const t=T(), A={gender:R.gender,occupation:R.occupation,dt_reason:R.dt_reason};
+  screen(`<div><p class="eyebrow">${t.part(4,t.sections[3])}</p><h2>${t.lastH}</h2></div>
+  <div class="panel">
+  <div class="q"><span class="t">${t.gender}</span>${choice("gender",["Female","Male","Prefer not to say"],true,A.gender)}</div>
+  <div class="q"><span class="t">${t.occ}</span>${choice("occupation",["Student","Employed","Self-employed","Not working","Other"],false,A.occupation)}</div>
+  <div class="q"><label class="t" for="area">${t.area}</label><input type="text" id="area" maxlength="60" placeholder="${t.areaPh}" value="${esc(R.area||"")}"></div>
+  <div class="q"><span class="t">${t.reason}</span>${choice("dt_reason",["Work","Study","Living there","Shopping or leisure","I don't go regularly"],false,A.dt_reason)}</div>
+  <div class="q"><label class="t" for="comment">${t.comment} <span class="muted">${t.optional}</span></label><textarea id="comment" maxlength="600">${esc(R.comment||"")}</textarea></div>
+  </div>`,{next:()=>{ Object.assign(R,A,{area:$("area").value.trim(),comment:$("comment").value.trim()}); finish(); },nextLabel:t.submit});
+  const check=()=>{ Object.assign(R,{gender:A.gender,occupation:A.occupation,dt_reason:A.dt_reason,area:$("area").value.trim(),comment:$("comment").value.trim()}); setReady(A.gender&&A.occupation&&A.dt_reason); };
+  wireChoices(A,check); $("area").oninput=check; $("comment").oninput=check; check();
+}
+
+/* ---------- walk player: left side passes, the view turns, right side passes ---------- */
+function playWalk(code,done){
+  const {seq:all}=seq(code);
+  const L=all.filter(x=>x.side==="Left"), Rt=all.filter(x=>x.side==="Right");
+  const st=$("stage"); $("actions").hidden=true;
+  const imgs=list=>list.map(x=>`<img alt="" src="${x.src}" decoding="async">`).join("");
+  st.innerHTML=`<div id="turnwrap" dir="ltr"><div class="view" id="vL"><div class="strip" id="sL">${imgs(L)}</div></div><div class="view" id="vR" style="opacity:0"><div class="strip" id="sR">${imgs(Rt)}</div></div></div>`;
+  st.hidden=false; ["wbar","wlabel","skip","sidelab"].forEach(id=>$(id).hidden=false);
+  const stripW=list=>{ const H=st.clientHeight; return list.reduce((a,x)=>a+H*x.w/x.h-40,40); };
+  const T_=CONFIG.WALK_SECONDS, TURN=1.6, SIDE=(T_-TURN)/2;
+  const lab=$("sidelab"); lab.textContent=T().left; lab.style.opacity=1;
+  const t0=performance.now(); let ended=false, phase=0;
+  const end=(skipped)=>{ if(ended) return; ended=true; const watched=Math.min(T_,(performance.now()-t0)/1000);
+    st.hidden=true; ["wbar","wlabel","skip","sidelab"].forEach(id=>$(id).hidden=true); st.innerHTML=""; done(+watched.toFixed(1),skipped); };
+  $("skip").onclick=()=>end(true);
+  const ease=x=>x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2;
+  const tick=()=>{ if(ended) return;
+    const t=(performance.now()-t0)/1000, vw=st.clientWidth; if(t>=T_){ end(false); return; }
+    const sL=$("sL"), sR=$("sR"), vL=$("vL"), vR=$("vR");
+    const pL=Math.min(1,t/SIDE); sL.style.transform=`translateX(${-Math.max(0,stripW(L)-vw)*pL}px)`;
+    const pR=Math.max(0,Math.min(1,(t-SIDE-TURN)/SIDE)); sR.style.transform=`translateX(${-Math.max(0,stripW(Rt)-vw)*(1-pR)}px)`;
+    if(t>SIDE && t<SIDE+TURN){ const q=ease((t-SIDE)/TURN);
+      vL.style.transform=`translateX(${-q*40}%) rotateY(${q*75}deg)`; vL.style.opacity=1-q;
+      vR.style.transform=`translateX(${(1-q)*40}%) rotateY(${-(1-q)*75}deg)`; vR.style.opacity=q;
+      if(phase===0){ phase=1; lab.style.opacity=0; } }
+    else if(t>=SIDE+TURN && phase<2){ phase=2; vL.style.opacity=0; vR.style.transform="none"; vR.style.opacity=1; lab.textContent=T().right; lab.style.opacity=1; }
+    $("wfill").style.width=(100*t/T_)+"%"; $("wlabel").textContent=num(`0:${String(Math.ceil(T_-t)).padStart(2,"0")}`);
+    requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+}
+
+/* ---------- saving ---------- */
+async function submit(screenedOut=false){
+  R.finished_at=new Date().toISOString();
+  R.total_minutes=+(((Date.now()-new Date(R.started_at))/60000).toFixed(1));
+  R.completed=screenedOut?"screened_out":"yes"; R.language=LANG;
+  const row={...R}; for(const k of Object.keys(row)) if(k.startsWith("_")) delete row[k];
+  if(TEST){ console.log("Test mode, not saved:",row); return {ok:true,test:true,row}; }
+  try{
+    await fetch(CONFIG.SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(row)});
+    try{ localStorage.setItem("dtsurvey_done","1"); }catch(e){}
+    return {ok:true};
+  }catch(e){ return {ok:false,row}; }
+}
+async function finish(){
+  current=()=>screen(`<h2>${T().savingH}</h2><p class="muted">${T().savingP}</p>`); current();
+  const r=await submit();
+  if(!r.ok){ current=()=>screen(`<h2>${T().failH}</h2><p class="lead">${T().failP}</p>`,{next:finish,nextLabel:T().retry,back:false}); current(); return; }
+  finished=true; renderStepper();
+  current=()=>{ const t=T(); screen(`<div><p class="eyebrow">${t.doneEb}</p><h1>${t.doneH}</h1></div>
+  <p class="lead">${r.test?t.doneTest:t.doneP}</p>
+  <div class="panel"><h3>${t.aboutStudyH}</h3><p>${t.aboutStudyP}</p></div>
+  ${r.test?`<details dir="ltr"><summary class="muted">Test mode: the row that would be saved</summary><pre style="white-space:pre-wrap;font-size:12px">${esc(JSON.stringify(r.row,null,1))}</pre></details>`:""}`); renderStepper(); };
+  current();
+}
+
+/* ---------- start ---------- */
+if(TEST) document.body.insertAdjacentHTML("afterbegin",`<div class="testbar"></div>`);
+applyLang();
+let already=false; try{ already=localStorage.getItem("dtsurvey_done")==="1"; }catch(e){}
+if(already && !TEST){ finished=true; renderStepper(); current=()=>screen(`<h2>${T().alreadyH}</h2><p class="lead">${T().alreadyP}</p>`); current(); }
+else go(0);
+setTimeout(()=>{ for(const c of PART1) for(const x of STREETS[c].seq){ const im=new Image(); im.src=x.src; } },1500);
+</script>
+
+</body>
+</html>
